@@ -1,0 +1,158 @@
+---
+title: "Lab04"
+author: "Chris Davis"
+date: "2/9/2017"
+output: github_document
+---
+
+```{r}
+setwd("~/Desktop/DDMII/ChrisDavisLabs/Lab04")
+library( rgdal )
+library( maptools )
+library( geojsonio )
+library(dplyr)
+library(RColorBrewer)
+library(maps)
+
+syr <- readOGR(dsn = "syr_parcels.geojson")
+
+```
+
+
+```{r}
+proj4string( syr )
+
+syr <- spTransform( syr, CRS("+proj=longlat +datum=WGS84") )
+
+proj4string( syr )
+
+```
+
+```{r}
+dat <- as.data.frame(syr)
+```
+
+Question 1: How many single family homes are in each neighborhood?
+
+•	Create a table of the count of single family homes by neighborhood
+
+
+
+```{r}
+dat<- tbl_df(dat)
+singles <- filter(dat, LandUse == "Single Family")
+datGrouped <- group_by(singles, Nhood)
+summarize(datGrouped, total = n())
+```
+
+•	Highlight all single family homes, using a different color for each neighborhood
+
+```{r}
+mySingles <- syr[syr$LandUse == "Single Family", ]
+notSingles <- syr[syr$LandUse != "Single Family", ]
+
+plot(notSingles, col = "grey", border = "grey", main = "Single Family Houses by Neighborhood")
+
+
+
+myPallete <- c(brewer.pal(12, "Set3"), brewer.pal(9, "Set1"), brewer.pal(12, "Paired"))
+
+palette(myPallete)
+
+plot(mySingles, col = as.factor(mySingles$Nhood), border = as.factor(mySingles$Nhood), add = T)
+legend( "bottomright", bg="white",
+        pch=19, pt.cex=.5, cex=.35,
+        legend=levels(mySingles$Nhood), 
+        col=palette(), 
+        box.col="white",
+        title="Single Family Houses by Neighborhood" 
+       )
+
+
+```
+
+Question 2: Where does land in Syracuse have the highest value? 
+
+
+•	Create a table of the count of single family homes with values above $200k in each neighborhood, as a pecentage of all single family homes
+```{r}
+ myTable <- summarize(datGrouped, total = n(), homesAbove200 = round(sum(AssessedVa > 200000)/nrow(mySingles)*100, digits = 3))
+
+myTable <- arrange(myTable, desc(homesAbove200))
+
+myTable$homesAbove200 <- paste(myTable$homesAbove200, "%", sep = "")
+
+print(myTable, n = 31)
+```
+
+•	Plot the value / acre of all parcels in Syracuse
+```{r}
+
+color.function <- colorRampPalette(c("light gray", "steel blue")) 
+col.ramp <- color.function( 5 ) # number of groups you desire
+
+color.vector <- cut(rank(dat$AssessedVa/dat$Acres), breaks=5, labels=col.ramp )
+
+color.vector <- as.character( color.vector )
+
+plot(syr, col=color.vector, border = F, main = "Value / Acre of All Parcels in Syracuse")
+
+map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+
+
+legend( "bottomright", bg="white",
+        pch=19, pt.cex=1.5, cex=0.7,
+        legend = c("192 - 268,168", "268,168 - 401,571", "401,571 - 519,527", "519,527 - 673,842", "673,842 - 44,726,212"),
+        col=col.ramp, 
+        box.col="white",
+        title="Assessed Value Per Acre" 
+       )
+```
+
+
+Question 3: What is the age of single family homes in each neighborhood? 
+
+•	Create a table that reports the 10th, 25th, 50th, 75th, and 90th percentile of home ages in each neighborhood.
+```{r}
+dat <- mutate(dat, age =2017 - as.numeric(as.character(YearBuilt)))
+singles <- filter(dat, LandUse == "Single Family")
+datGrouped <- group_by(singles, Nhood)
+ myTable <- summarize(datGrouped, 
+         tenth = quantile(age, .1, na.rm = T),
+         twentyFifth = quantile(age, .25, na.rm = T), 
+         fiftyth = quantile(age, .5, na.rm = T),
+         seventyFifth = quantile(age, .75, na.rm = T),
+         ninetyth = quantile(age, .9, na.rm = T))
+ options(tibble.width = Inf)
+ myTable <- arrange(myTable, tenth)
+ print(myTable, n = 45)
+
+```
+
+•	Create a choropleth map that shows the age of properties by decade, pre-1900s can be one category.
+```{r}
+years <- as.numeric(as.character(dat$YearBuilt))
+
+color.function <- colorRampPalette( c("firebrick4", "light gray" ) ) 
+
+col.ramp <- color.function( 13 )
+
+myAges <- cut(years, breaks = c(1790, seq(from = 1900, to = 2020, by = 10)), dig.lab = 10, labels = col.ramp)
+
+plot(syr, col = as.character(myAges), border = F, main = "Year Built of Property in Syracuse")
+
+map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+
+legend("bottomright", bg="white",
+        pch=19, pt.cex=1.5, cex=0.7,
+        legend = paste(c(1790, seq(from = 1900, to = 2010, by = 10)), "-", seq(from = 1900, to = 2020, by = 10),sep = " "),
+        col=col.ramp, 
+        box.col="white",
+        title="Year Property was Built" 
+       )
+
+
+```
+
+
+
