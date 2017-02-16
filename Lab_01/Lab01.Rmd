@@ -1,0 +1,97 @@
+---
+title: "Lab01"
+author: "Chris Davis"
+date: "1/31/2017"
+output: github_document
+---
+Load libraries
+```{r}
+library(dplyr)
+library(pander)
+library(ggmap)
+```
+
+
+
+Follow the steps in the Dates tutorial to read in the code violation data and drop all variables except violation dates, violation types, and their coordinates (lat,lon).
+```{r, warning=F}
+
+data.url <- "https://raw.githubusercontent.com/lecy/code-orange/master/data/code%20violations.csv"
+dat <- read.csv( data.url, stringsAsFactors=F)
+dat <- tbl_df(dat)
+dat <- select(dat, Complaint.Type, Violation.Date, lat, lon) %>% tbl_df
+dat
+
+```
+
+
+Convert the Violation.Date from a character into a date class.
+```{r}
+
+dat$Violation.Date <- as.Date( dat$Violation.Date, format="%m/%d/%Y" )
+
+```
+
+Create new variables for days of the week (Mon, Tues, Wed, etc.), weeks of the year (1-52), months, and years.
+```{r}
+days <- format(dat$Violation.Date, format = "%a")
+dayLabels <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+days <- factor(days, ordered = T, levels = dayLabels)
+
+
+weeks <- format(dat$Violation.Date, format = "%U")
+
+months <- format(dat$Violation.Date, format = "%b")
+in.order <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+months <- factor(months, ordered = T, levels = in.order)
+
+years <- format(dat$Violation.Date, format = "%Y")
+
+dat <- mutate(dat, days)
+dat <- mutate(dat, weeks)
+dat <- mutate(dat, months)
+dat <- mutate(dat, years)
+
+```
+
+Select a category of code violations other than bed bugs and create a new dataset with all other data dropped.
+
+```{r}
+fires <- filter(dat, dat$Complaint.Type=="Fire Safety")
+fires
+```
+
+
+Create graphs to demonstrate the patterns in violations when you aggregate by the new date variables you have created.
+```{r}
+plot( table(fires$days), lty=3, lwd=3, las=2, cex.axis=0.5, ylab="Number of Fire Safety Complaints", bty = "n", main = "Number of Fire Safety Complaints by Day of the Week in Syracuse" )
+```
+
+```{r}
+plot( table(fires$weeks), lty=3, lwd=3, las=2, cex.axis=0.5, ylab="Number of Fire Safety Complaints", bty = "n", main = "Number of Fire Safety Complaints by Week in Syracuse")
+```
+
+```{r}
+plot( table(fires$months), lty=3, lwd=3, las=2, cex.axis=0.5, ylab="Number of Fire Safety Complaints", bty = "n", main = "Number of Fire Safety Complaints by Month in Syracuse" )
+```
+
+```{r}
+plot( table(fires$years), lty=3, lwd=3, las=2, cex.axis=0.5,  ylab="Number of Fire Safety Complaints", bty = "n", main = "Number of Fire Safety Copmlaints by Year in Syracuse" )
+```
+
+
+Select one year of data. Using the qmplot() function in the ggmap package, create a plot with one map for each month.
+```{r, warning = F}
+fires2014 <- filter(fires, fires$years == "2014")
+
+syr.min.lat <-  42.96
+syr.max.lat <-  43.12
+syr.min.lon <- -76.25
+syr.max.lon <- -76.05
+
+fires2014 <- fires2014[ fires2014$lat > syr.min.lat & fires2014$lat < syr.max.lat , ]
+fires2014 <- fires2014[ fires2014$lon > syr.min.lon & fires2014$lon < syr.max.lon , ]
+
+qmplot(lon, lat, data = fires2014, maptype="toner-lite", alpha=0.3, color=months) + facet_wrap(~ months, drop = F) 
+```
+
