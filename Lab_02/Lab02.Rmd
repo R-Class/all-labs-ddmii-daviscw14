@@ -5,6 +5,11 @@ date: "2/1/2017"
 output: github_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
 ```{r}
 random.walk <- cumsum(rnorm(100))
   

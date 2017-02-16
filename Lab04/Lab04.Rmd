@@ -5,6 +5,11 @@ date: "2/9/2017"
 output: github_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
 ```{r}
 setwd("~/Desktop/DDMII/ChrisDavisLabs/Lab04")
 library( rgdal )

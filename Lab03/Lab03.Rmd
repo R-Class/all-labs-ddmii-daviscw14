@@ -5,6 +5,11 @@ date: "2/9/2017"
 output: github_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
 Question 1: What are the demographics of neighborhoods in Syracuse? 
 
 •	Download a TIGER shapefile of census tracts in Syracuse (Onondaga County)
