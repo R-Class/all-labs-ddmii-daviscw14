@@ -2,7 +2,10 @@
 title: "Lab04"
 author: "Chris Davis"
 date: "2/9/2017"
-output: github_document
+output: 
+    html_document:
+      df_print: paged
+      keep_md: true
 ---
 
 ```{r setup, include=FALSE}

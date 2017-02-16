@@ -1,70 +1,39 @@
-Lab03
-================
-Chris Davis
-2/9/2017
+# Lab03
+Chris Davis  
+2/9/2017  
 
-Question 1: What are the demographics of neighborhoods in Syracuse?
 
-• Download a TIGER shapefile of census tracts in Syracuse (Onondaga County)
 
-``` r
+
+
+
+Question 1: What are the demographics of neighborhoods in Syracuse? 
+
+•	Download a TIGER shapefile of census tracts in Syracuse (Onondaga County)
+
+
+```r
 #dir.create( "shapefiles" )
 setwd( "./shapefiles" )
 
 library( maptools )
-```
-
-    ## Warning: package 'maptools' was built under R version 3.3.2
-
-    ## Loading required package: sp
-
-    ## Checking rgeos availability: TRUE
-
-``` r
 library( sp )
 library(maps)
 
 syr <- readShapePoly( fn="tl_2015_36_tract/tl_2015_36_tract", proj4string=CRS("+proj=longlat +datum=WGS84") ) #had to download manually
-```
 
-    ## NOTE: rgdal::checkCRSArgs: no proj_defs.dat in PROJ.4 shared files
-
-``` r
 syr <- syr[syr$COUNTYFP=="067", ]
 plot( syr,  border="gray10" )
 ```
 
-![](Lab03_files/figure-markdown_github/unnamed-chunk-1-1.png)
+![](Lab03_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
 
-• Download three demographic variables of interest, your choice, using the censusapi package
+•	Download three demographic variables of interest, your choice, using the censusapi package
 
-``` r
+
+```r
 library(censusapi)
-```
-
-    ## 
-    ## Attaching package: 'censusapi'
-
-    ## The following object is masked from 'package:methods':
-    ## 
-    ##     getFunction
-
-``` r
 library(dplyr)
-```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
-``` r
 censuskey <- "b431c35dad89e2863681311677d12581e8f24c24"
 
 labels <- c("name", "state", "county", "tract", "TOTAL", "MEDIANHOUSEINCOME", "BLACK", "UNEMPLOYED", "INLABORFORCE", "POVERTY")
@@ -75,9 +44,9 @@ names(dat) <- labels
 dat <-tbl_df(dat)
 ```
 
-• Create choropleth maps that include a title and legend for each variable
+•	Create choropleth maps that include a title and legend for each variable
 
-``` r
+```r
 color.function <- colorRampPalette( c("firebrick4","light gray", "steel blue") ) 
 
 col.ramp <- color.function( 5 ) # number of groups you desire
@@ -106,9 +75,11 @@ legend( "bottomright", bg="white",
        )
 ```
 
-![](Lab03_files/figure-markdown_github/unnamed-chunk-3-1.png)
+![](Lab03_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
-``` r
+
+
+```r
 color.function <- colorRampPalette( c("firebrick4","light gray","steel blue") )  
 
 col.ramp <- color.function( 5 ) # number of groups you desire
@@ -138,9 +109,10 @@ legend( "bottomright", bg="white",
        )
 ```
 
-![](Lab03_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](Lab03_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
-``` r
+
+```r
 color.function <- colorRampPalette( c("steel blue","light gray","firebrick4" ) ) 
 
 col.ramp <- color.function( 5 ) # number of groups you desire
@@ -169,9 +141,11 @@ legend( "bottomright", bg="white",
        )
 ```
 
-![](Lab03_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](Lab03_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
-``` r
+
+
+```r
 color.function <- colorRampPalette( c("steel blue","light gray","firebrick4" ) ) 
 
 col.ramp <- color.function( 5 ) # number of groups you desire
@@ -199,4 +173,6 @@ legend( "bottomright", bg="white",
        )
 ```
 
-![](Lab03_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](Lab03_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
+

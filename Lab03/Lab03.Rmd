@@ -2,8 +2,12 @@
 title: "Lab03"
 author: "Chris Davis"
 date: "2/9/2017"
-output: github_document
+output: 
+    html_document:
+      df_print: paged
+      keep_md: true
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message= F, warning = F)
