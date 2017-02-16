@@ -102,7 +102,7 @@ plot(syr, col=color.vec.ordered, main = "Median Household Income in Onondaga Cou
 
 map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
 
-legend.text=c(" $8,942 - $31,353"," $31,353 - $48,611"," $48,611 - $63,013"," $63,013 - $75,357"," $75,357 - $125,724")
+legend.text=c(" $8,942 - $31,036"," $31,036 - $46,889"," $46,889 - $62,637"," $62,637 - $75,268"," $75,268 - $125,724")
 
 legend( "bottomright", bg="white",
         pch=19, pt.cex=1.5, cex=0.7,
@@ -132,7 +132,7 @@ plot(syr, col=color.vec.ordered, main = "Unemployment in Onondaga County")
 
 map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
 
-legend.text=c(" 0% - 3.96%"," 3.95% - 5.82%"," 5.82% - 7.23%"," 7.23% - 10.44%"," 10.44% - 32.81%")
+legend.text=c(" 0% - 3.96%"," 3.96% - 5.80%"," 5.80% - 7.19%"," 7.19% - 10.58%"," 10.58% - 32.81%")
 
 legend( "bottomright", bg="white",
         pch=19, pt.cex=1.5, cex=0.7,
@@ -164,7 +164,7 @@ plot(syr, col=color.vec.ordered, main = "Black Population in Onondaga County")
 
 map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
 
-legend.text=c(" 0% - 0.70%"," 0.07% - 2.74%"," 2.74% - 9.03%"," 9.03% - 23.99%"," 23.99% - 85.58%")
+legend.text=c(" 0% - 0.69%"," 0.69% - 2.72%"," 2.72% - 8.84%"," 8.84% - 24.14%"," 24.14% - 85.58%")
 
 legend( "bottomright", bg="white",
         pch=19, pt.cex=1.5, cex=0.7,
