@@ -110,7 +110,7 @@ map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
 
 legend( "bottomright", bg="white",
         pch=19, pt.cex=1.5, cex=0.7,
-        legend = c("192 - 268,168", "268,168 - 401,571", "401,571 - 519,527", "519,527 - 673,842", "673,842 - 44,726,212"),
+        legend = c("192 - 268,183", "268,183 - 401,580", "401,580 - 519,512", "519,512 - 673,842", "673,842 - 44,726,212"),
         col=col.ramp, 
         box.col="white",
         title="Assessed Value Per Acre" 
