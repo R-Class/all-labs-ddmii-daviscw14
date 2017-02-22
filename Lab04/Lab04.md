@@ -79,7 +79,7 @@ notSingles <- syr[syr$LandUse != "Single Family", ]
 
 plot(notSingles, col = "grey", border = "grey", main = "Single Family Houses by Neighborhood")
 
-
+par(mar = c(0,0,0,0))
 
 myPallete <- c(brewer.pal(12, "Set3"), brewer.pal(9, "Set1"), brewer.pal(12, "Paired"))
 
@@ -166,7 +166,7 @@ map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
 
 legend( "bottomright", bg="white",
         pch=19, pt.cex=1.5, cex=0.7,
-        legend = c("192 - 268,168", "268,168 - 401,571", "401,571 - 519,527", "519,527 - 673,842", "673,842 - 44,726,212"),
+        legend = c("192 - 268,183", "268,183 - 401,580", "401,580 - 519,512", "519,512 - 673,842", "673,842 - 44,726,212"),
         col=col.ramp, 
         box.col="white",
         title="Assessed Value Per Acre" 

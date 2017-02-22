@@ -55,13 +55,13 @@ summarize(datGrouped, total = n())
 
 •	Highlight all single family homes, using a different color for each neighborhood
 
-```{r}
+```{r fig.width = 10}
 mySingles <- syr[syr$LandUse == "Single Family", ]
 notSingles <- syr[syr$LandUse != "Single Family", ]
 
 plot(notSingles, col = "grey", border = "grey", main = "Single Family Houses by Neighborhood")
 
-
+par(mar = c(0,0,0,0))
 
 myPallete <- c(brewer.pal(12, "Set3"), brewer.pal(9, "Set1"), brewer.pal(12, "Paired"))
 

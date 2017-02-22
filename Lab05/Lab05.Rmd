@@ -1,0 +1,97 @@
+---
+title: "Lab05"
+author: "Chris Davis"
+date: "2/20/2017"
+output: 
+    html_document:
+      df_print: paged
+      keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message= F, warning = F)
+```
+
+<br>**Start with the dataset of home prices and assets collected from Zillow**<br>
+```{r}
+library( spatialEco ) # spatial econometrics package
+library( sp )  # spatial analysis package
+library( dplyr )
+library(ggmap)
+library( maptools )
+library(maps)
+
+houses <- read.csv("https://raw.githubusercontent.com/lecy/hedonic-prices/master/Data/Housing%20Price%20In-Class%20Exercise%20(Responses).csv", stringsAsFactors = F)
+ 
+houses <- tbl_df(houses)
+
+#Some of these addresses already have 'Syracuse, NY' - don't feel like removing with the gsub reg expression stuff
+#houses.lat.lon <- geocode(paste(houses$Street.Address.of.House, "Syracuse, NY", sep = ""))
+#write.csv(houses.lat.lon, file = "lat.lon.csv")
+
+setwd("~/Desktop/DDMII/ChrisDavisLabs/Lab05")
+lat.lon <- read.csv("lat.lon.csv")
+lat.lon <- lat.lon[ c("lon","lat")]
+
+lat.lon         
+```
+
+
+<br>**Get Census Data**<br>
+```{r}
+library(censusapi)
+library(dplyr)
+censuskey <- "b431c35dad89e2863681311677d12581e8f24c24"
+
+labels <- c("name", "state", "county", "tract", "TOTAL", "MEDIANHOUSEINCOME", "BLACK", "UNEMPLOYED", "INLABORFORCE", "POVERTY", "GEOID")
+
+census <- getCensus(name = "acs5", vintage = 2015, key = censuskey, vars = c("NAME","B01001_001E", "B19013_001E", "B01001B_001E", "B23025_005E", "B23025_002E", "B17001_002E"), region = "tract:*", regionin = "state: 36 + county:067")
+
+GEOID <- paste0(census$state, census$county, census$tract)
+census <- mutate(census, GEOID)
+
+names(census) <- labels
+census <- tbl_df(census)
+
+census
+
+```
+
+<br>**Add a census tracts FIPS ID to each home (spatial join to census tracts)**<br>
+```{r}
+syr <- readShapePoly( fn="~/Desktop/DDMII/ChrisDavisLabs/Lab05/shapefiles/tl_2015_36_tract/tl_2015_36_tract", proj4string=CRS("+proj=longlat +datum=WGS84") ) #had to download manually
+
+
+
+lat.lon <- SpatialPoints(lat.lon, proj4string = CRS("+proj=longlat +datum=WGS84") )
+syr <- syr[syr$COUNTYFP=="067", ]
+syr$GEOID <- factor(syr$GEOID)
+
+overStuff <- over(lat.lon, syr)
+
+overStuff
+
+
+```
+<br>**Add census data to each home**<br>
+```{r}
+total <- merge(overStuff, census, by.x = "GEOID", by.y = "GEOID")
+
+total
+```
+<br>**Aggregate crimes by census tract (spatial join) and add to the dataset**<br>
+```{r}
+crimes <- read.csv("https://raw.githubusercontent.com/lecy/hedonic-prices/master/Data/crime.lat.lon.csv", stringsAsFactors = F)
+
+crimes <- SpatialPoints(crimes, proj4string = CRS("+proj=longlat +datum=WGS84") )
+crimes <- over(crimes, syr)
+
+crimes <- as.data.frame(table(crimes$GEOID))
+names(crimes) <- c("GEOID", "numberCrimes")
+
+full <- merge(crimes, total, by.x = "GEOID", by.y = "GEOID")
+
+full
+```
+
+
