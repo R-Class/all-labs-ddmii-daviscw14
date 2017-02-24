@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 output_dir: '.'
 output:
   html_document:
@@ -13,13 +12,3 @@ output:
       before_body: include_header.html
       after_body: include_footer.html
     css: css/rmarkdown.css
-=======
-title: Test Site
-description: This site is to test the use of github sites
-google_analytics: UA-91780879-1
-show_downloads: false
-theme: jekyll-theme-architect
-
--gems:
- -  - jekyll-mentions
->>>>>>> 044774f69ec8a99c09d38b8faa39c2a19d064114
