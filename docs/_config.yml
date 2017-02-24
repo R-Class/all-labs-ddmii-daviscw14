@@ -2,7 +2,7 @@ title: Test Site
 description: This site is to test the use of github sites
 google_analytics: UA-91780879-1
 show_downloads: false
-theme: cosmo
+theme: jekyll-theme-architect
 
 -gems:
  -  - jekyll-mentions
