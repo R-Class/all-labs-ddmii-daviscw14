@@ -12,7 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, message= F, warning = F)
 ```
 
-<br>**Start with the dataset of home prices and assets collected from Zillow**<br>
+##Start with the dataset of home prices and assets collected from Zillow
 ```{r}
 library( spatialEco ) # spatial econometrics package
 library( sp )  # spatial analysis package
@@ -37,7 +37,7 @@ lat.lon
 ```
 
 
-<br>**Get Census Data**<br>
+##Get Census Data
 ```{r}
 library(censusapi)
 library(dplyr)
@@ -57,7 +57,7 @@ census
 
 ```
 
-<br>**Add a census tracts FIPS ID to each home (spatial join to census tracts)**<br>
+##Add a census tracts FIPS ID to each home (spatial join to census tracts)
 ```{r}
 syr <- readShapePoly( fn="~/Desktop/DDMII/ChrisDavisLabs/Lab05/shapefiles/tl_2015_36_tract/tl_2015_36_tract", proj4string=CRS("+proj=longlat +datum=WGS84") ) #had to download manually
 
@@ -73,13 +73,13 @@ overStuff
 
 
 ```
-<br>**Add census data to each home**<br>
+##Add census data to each home
 ```{r}
 total <- merge(overStuff, census, by.x = "GEOID", by.y = "GEOID")
 
 total
 ```
-<br>**Aggregate crimes by census tract (spatial join) and add to the dataset**<br>
+##Aggregate crimes by census tract (spatial join) and add to the dataset
 ```{r}
 crimes <- read.csv("https://raw.githubusercontent.com/lecy/hedonic-prices/master/Data/crime.lat.lon.csv", stringsAsFactors = F)
 
