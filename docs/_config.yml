@@ -1,12 +1,13 @@
 output_dir: '.'
+theme: jekyll-theme-architect
+-gems:
+ -  - jekyll-mentions
 output:
   html_document:
-    theme: jekyll-theme-architect
     highlight: textmate
     mathjax: null
     toc_depth: 3
     toc_float:
       collapsed: false
    
-   -gems:
- -  - jekyll-mentions
+   
