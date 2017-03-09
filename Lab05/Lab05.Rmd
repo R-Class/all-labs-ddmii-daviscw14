@@ -92,6 +92,9 @@ names(crimes) <- c("GEOID", "numberCrimes")
 full <- merge(crimes, total, by.x = "GEOID", by.y = "GEOID")
 
 full
+
+write.csv(full, "housing.csv")
+
 ```
 
 

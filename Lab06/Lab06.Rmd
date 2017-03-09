@@ -1,0 +1,169 @@
+---
+title: "Lab06"
+author: "Chris Davis"
+date: "3/8/2017"
+output: 
+    html_document:
+      df_print: paged
+      keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message= F, warning = F, fig.width = 10)
+```
+#Part I
+##Load Plot and Shapefile
+```{r}
+library( maptools )
+library( sp )
+library(maps)
+
+syr <- readShapePoly( fn="shapefiles/tl_2010_36067_tract10", proj4string=CRS("+proj=longlat +datum=WGS84") )
+
+par( mar=c(0,0,0,0) )
+plot( syr,  border="gray10" )
+
+```
+
+##Add Roads
+```{r}
+roads <- readShapeLines( fn="shapefiles/tl_2015_36_prisecroads", proj4string=CRS("+proj=longlat +datum=WGS84") )
+
+head( roads@data )
+table( roads$RTTYP )
+
+#Extract Intersate
+interstate <- roads[ roads$RTTYP == "I" , ]
+```
+##Look at unclipped portion
+```{r}
+par( mar=c(0,0,0,0) )
+plot( syr,  border="gray80" )
+plot( roads, col="steelblue", lwd=2, add=T)
+plot(interstate, col = "red", add = T)
+```
+
+##Clip
+```{r}
+library(raster)
+library(rgeos)
+
+gClip <- function(shp, bb) {
+  if(class(bb) == "matrix") b_poly <- as(extent(as.vector(t(bb))), "SpatialPolygons") 
+  else b_poly <- as(extent(bb), "SpatialPolygons")
+  gIntersection(shp, b_poly, byid = T)
+}
+
+#Could do just bbox(syr) for the box but that looks worse than this
+xs <- c(-76.47916, -75.90119)
+ys <- c(42.78893, 43.22481)
+
+b <- bbox(syr)
+b[1, ] <- xs
+b[2, ] <- ys
+
+
+roads_clipped <- gClip(roads, b)
+interstate_clipped <- gClip(interstate, b)
+
+
+```
+##Plot Clipped 
+```{r}
+plot( syr,  border="gray80" )
+#plot( roads_clipped, col="steelblue", lwd=2, add=T)
+plot( interstate_clipped, col="red", add=T)
+map.scale( metric=F, ratio=F, relwidth = 0.05, cex=0.5 )
+
+```
+
+##Houses
+```{r}
+library(dplyr)
+houses <- read.csv("housing.csv", stringsAsFactors = F)
+
+plot( syr,  border="gray80" )
+#plot( roads_clipped, col="steelblue", lwd=2, add=T)
+plot( interstate_clipped, col="red", add=T)
+map.scale( metric=F, ratio=F, relwidth = 0.05, cex=0.5 )
+  
+points(houses$INTPTLON, houses$INTPTLAT, pch = 19, cex=.3)
+buff <- gBuffer(interstate_clipped, width = .005)
+plot(buff, add=T)
+
+```
+
+##Buffer it up
+```{r}
+
+houses <- tbl_df(houses)
+lat.lon <- select(houses, INTPTLON, INTPTLAT)
+names(lat.lon) <- c("lon", "lat")
+lat.lon <- SpatialPoints(lat.lon, proj4string = CRS("+proj=longlat +datum=WGS84") )
+
+overStuff <- over(lat.lon, buff)
+overStuff[is.na(overStuff)] <- 0
+nearHighway <- overStuff==1
+
+houses<- mutate(houses, nearHighway)
+
+nearHighway
+```
+
+#Part II
+```{r}
+
+library( rgdal )
+library( maptools )
+library( geojsonio )
+library(dplyr)
+library(RColorBrewer)
+library(maps)
+
+syr <- readOGR(dsn = "shapefiles/syr_parcels.geojson")
+
+industrials <- syr[syr$LandUse=="Industrial", ]
+notIndustrials <- syr[syr$LandUse!="Industrial", ]
+
+plot(notIndustrials, col = "grey", border = F)
+
+plot(industrials, add = T, col = "blue")
+
+industrialBuff <- gBuffer(industrials, width = .004)
+
+ overs <- over(syr, industrialBuff)
+
+nearIndustry <- overs==1
+nearIndustry[is.na(nearIndustry)]<- F
+
+syr <- cbind(syr, nearIndustry)
+
+plot(industrialBuff, add = T, col = rgb(44, 4, 248, alpha = 50, maxColorValue = 355))
+
+map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+
+```
+
+```{r}
+schools <- syr[syr$LandUse=="Schools", ]
+notSchools <- syr[syr$LandUse!="Schools", ]
+
+plot(notSchools, col = "grey", border = F)
+plot(schools, add = T, col = "red")
+
+schoolBuff <- gBuffer(schools, width = .002)
+
+ overs <- over(syr, schoolBuff)
+
+nearSchools <- overs==1
+nearSchools[is.na(nearSchools)]<- F
+
+syr <- cbind(syr, nearSchools)
+
+plot(schoolBuff, add = T, col = rgb(248, 18, 18, alpha = 50, maxColorValue = 355))
+
+map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+
+```
+
+

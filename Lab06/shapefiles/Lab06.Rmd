@@ -1,0 +1,78 @@
+---
+title: "Lab06"
+author: "Chris Davis"
+date: "3/8/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Load Plot and Shapefile
+```{r}
+library( maptools )
+library( sp )
+
+syr <- readShapePoly( fn="tl_2010_36067_tract10", proj4string=CRS("+proj=longlat +datum=WGS84") )
+
+par( mar=c(0,0,0,0) )
+plot( syr,  border="gray10" )
+
+```
+
+#Add Roads
+```{r}
+roads <- readShapeLines( fn="tl_2015_36_prisecroads", proj4string=CRS("+proj=longlat +datum=WGS84") )
+
+head( roads@data )
+table( roads$RTTYP )
+
+#Extract Intersate
+interstate <- roads[ roads$RTTYP == "I" , ]
+```
+#Look at unclipped portion
+```{r}
+par( mar=c(0,0,0,0) )
+plot( syr,  border="gray80" )
+plot( roads, col="steelblue", lwd=2, add=T)
+plot(interstate, col = "red", add = T)
+```
+
+#Clip
+```{r}
+library(raster)
+library(rgeos)
+
+gClip <- function(shp, bb) {
+  if(class(bb) == "matrix") b_poly <- as(extent(as.vector(t(bb))), "SpatialPolygons") 
+  else b_poly <- as(extent(bb), "SpatialPolygons")
+  gIntersection(shp, b_poly, byid = T)
+}
+
+#Could do just bbox(syr) for the box but that looks worse than this
+xs <- c(-76.47916, -75.90119)
+ys <- c(42.78893, 43.22481)
+
+b <- bbox(syr)
+b[1, ] <- xs
+b[2, ] <- ys
+
+
+roads_clipped <- gClip(roads, b)
+interstate_clipped <- gClip(interstate, b)
+
+
+```
+#Plot Clipped 
+```{r}
+plot( syr_clipped,  border="gray80" )
+#plot( roads_clipped, col="steelblue", lwd=2, add=T)
+plot( interstate_clipped, col="red", add=T)
+```
+
+#Houses
+```{r}
+houses <- read.csv("https://raw.githubusercontent.com/lecy/hedonic-prices/master/Data/Housing%20Price%20In-Class%20Exercise%20(Responses).csv", stringsAsFactors = F)
+```
+
+
