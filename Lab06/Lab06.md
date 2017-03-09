@@ -64,23 +64,7 @@ plot(interstate, col = "red", add = T)
 library(raster)
 library(rgeos)
 
-gClip <- function(shp, bb) {
-  if(class(bb) == "matrix") b_poly <- as(extent(as.vector(t(bb))), "SpatialPolygons") 
-  else b_poly <- as(extent(bb), "SpatialPolygons")
-  gIntersection(shp, b_poly, byid = T)
-}
-
-#Could do just bbox(syr) for the box but that looks worse than this
-xs <- c(-76.47916, -75.90119)
-ys <- c(42.78893, 43.22481)
-
-b <- bbox(syr)
-b[1, ] <- xs
-b[2, ] <- ys
-
-
-roads_clipped <- gClip(roads, b)
-interstate_clipped <- gClip(interstate, b)
+interstate_clipped <- gIntersection(syr, interstate)
 ```
 ##Plot Clipped 
 
@@ -97,15 +81,18 @@ map.scale( metric=F, ratio=F, relwidth = 0.05, cex=0.5 )
 
 ```r
 library(dplyr)
-houses <- read.csv("housing.csv", stringsAsFactors = F)
+houses <- read.csv("https://raw.githubusercontent.com/lecy/hedonic-prices/master/Data/Housing%20Price%20In-Class%20Exercise%20(Responses).csv", stringsAsFactors = F)
+
+lat.lon <- read.csv("lat.lon.csv", stringsAsFactors = F)
+lat.lon <- lat.lon[ c("lon","lat")]
 
 plot( syr,  border="gray80" )
 #plot( roads_clipped, col="steelblue", lwd=2, add=T)
 plot( interstate_clipped, col="red", add=T)
 map.scale( metric=F, ratio=F, relwidth = 0.05, cex=0.5 )
   
-points(houses$INTPTLON, houses$INTPTLAT, pch = 19, cex=.3)
-buff <- gBuffer(interstate_clipped, width = .005)
+points(lat.lon$lon, lat.lon$lat, pch = 19, cex=.3)
+buff <- gBuffer(interstate_clipped, width = .003621)
 plot(buff, add=T)
 ```
 
@@ -114,9 +101,6 @@ plot(buff, add=T)
 ##Buffer it up
 
 ```r
-houses <- tbl_df(houses)
-lat.lon <- select(houses, INTPTLON, INTPTLAT)
-names(lat.lon) <- c("lon", "lat")
 lat.lon <- SpatialPoints(lat.lon, proj4string = CRS("+proj=longlat +datum=WGS84") )
 
 overStuff <- over(lat.lon, buff)
@@ -130,19 +114,19 @@ nearHighway
 
 ```
 ##     1     2     3     4     5     6     7     8     9    10    11    12 
-##  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
-##    13    14    15    16    17    18    19    20    21    22    23    24 
-## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE 
-##    25    26    27    28    29    30    31    32    33    34    35    36 
-##  TRUE  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
-##    37    38    39    40    41    42    43    44    45    46    47    48 
 ## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
+##    13    14    15    16    17    18    19    20    21    22    23    24 
+## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
+##    25    26    27    28    29    30    31    32    33    34    35    36 
+## FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
+##    37    38    39    40    41    42    43    44    45    46    47    48 
+## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE 
 ##    49    50    51    52    53    54    55    56    57    58    59    60 
-## FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE 
+## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
 ##    61    62    63    64    65    66    67    68    69    70    71    72 
-##  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
+## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
 ##    73    74    75    76    77    78    79    80    81    82    83    84 
-##  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE 
+## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE 
 ##    85    86    87    88    89    90    91    92    93    94    95    96 
 ## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
 ##    97    98    99   100   101   102   103   104   105   106   107   108 
@@ -152,7 +136,7 @@ nearHighway
 ##   121   122   123   124   125   126   127   128   129   130   131   132 
 ## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
 ##   133   134   135   136   137   138   139   140   141   142   143   144 
-## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
+## FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE 
 ##   145   146   147   148 
 ## FALSE FALSE FALSE FALSE
 ```
@@ -185,7 +169,7 @@ plot(notIndustrials, col = "grey", border = F)
 
 plot(industrials, add = T, col = "blue")
 
-industrialBuff <- gBuffer(industrials, width = .004)
+industrialBuff <- gBuffer(industrials, width = .003621)
 
  overs <- over(syr, industrialBuff)
 
@@ -209,7 +193,7 @@ notSchools <- syr[syr$LandUse!="Schools", ]
 plot(notSchools, col = "grey", border = F)
 plot(schools, add = T, col = "red")
 
-schoolBuff <- gBuffer(schools, width = .002)
+schoolBuff <- gBuffer(schools, width = .001812)
 
  overs <- over(syr, schoolBuff)
 

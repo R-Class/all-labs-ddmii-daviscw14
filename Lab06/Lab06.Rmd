@@ -48,23 +48,7 @@ plot(interstate, col = "red", add = T)
 library(raster)
 library(rgeos)
 
-gClip <- function(shp, bb) {
-  if(class(bb) == "matrix") b_poly <- as(extent(as.vector(t(bb))), "SpatialPolygons") 
-  else b_poly <- as(extent(bb), "SpatialPolygons")
-  gIntersection(shp, b_poly, byid = T)
-}
-
-#Could do just bbox(syr) for the box but that looks worse than this
-xs <- c(-76.47916, -75.90119)
-ys <- c(42.78893, 43.22481)
-
-b <- bbox(syr)
-b[1, ] <- xs
-b[2, ] <- ys
-
-
-roads_clipped <- gClip(roads, b)
-interstate_clipped <- gClip(interstate, b)
+interstate_clipped <- gIntersection(syr, interstate)
 
 
 ```
@@ -80,15 +64,18 @@ map.scale( metric=F, ratio=F, relwidth = 0.05, cex=0.5 )
 ##Houses
 ```{r}
 library(dplyr)
-houses <- read.csv("housing.csv", stringsAsFactors = F)
+houses <- read.csv("https://raw.githubusercontent.com/lecy/hedonic-prices/master/Data/Housing%20Price%20In-Class%20Exercise%20(Responses).csv", stringsAsFactors = F)
+
+lat.lon <- read.csv("lat.lon.csv", stringsAsFactors = F)
+lat.lon <- lat.lon[ c("lon","lat")]
 
 plot( syr,  border="gray80" )
 #plot( roads_clipped, col="steelblue", lwd=2, add=T)
 plot( interstate_clipped, col="red", add=T)
 map.scale( metric=F, ratio=F, relwidth = 0.05, cex=0.5 )
   
-points(houses$INTPTLON, houses$INTPTLAT, pch = 19, cex=.3)
-buff <- gBuffer(interstate_clipped, width = .005)
+points(lat.lon$lon, lat.lon$lat, pch = 19, cex=.3)
+buff <- gBuffer(interstate_clipped, width = .003621)
 plot(buff, add=T)
 
 ```
@@ -96,9 +83,6 @@ plot(buff, add=T)
 ##Buffer it up
 ```{r}
 
-houses <- tbl_df(houses)
-lat.lon <- select(houses, INTPTLON, INTPTLAT)
-names(lat.lon) <- c("lon", "lat")
 lat.lon <- SpatialPoints(lat.lon, proj4string = CRS("+proj=longlat +datum=WGS84") )
 
 overStuff <- over(lat.lon, buff)
@@ -129,7 +113,7 @@ plot(notIndustrials, col = "grey", border = F)
 
 plot(industrials, add = T, col = "blue")
 
-industrialBuff <- gBuffer(industrials, width = .004)
+industrialBuff <- gBuffer(industrials, width = .003621)
 
  overs <- over(syr, industrialBuff)
 
@@ -151,7 +135,7 @@ notSchools <- syr[syr$LandUse!="Schools", ]
 plot(notSchools, col = "grey", border = F)
 plot(schools, add = T, col = "red")
 
-schoolBuff <- gBuffer(schools, width = .002)
+schoolBuff <- gBuffer(schools, width = .001812)
 
  overs <- over(syr, schoolBuff)
 
