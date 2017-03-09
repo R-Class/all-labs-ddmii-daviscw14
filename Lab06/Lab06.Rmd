@@ -113,7 +113,7 @@ plot(notIndustrials, col = "grey", border = F)
 
 plot(industrials, add = T, col = "blue")
 
-industrialBuff <- gBuffer(industrials, width = .003621, capStyle = "FLAT")
+industrialBuff <- gBuffer(industrials, width = .003621, capStyle = "FLAT", quadsegs = 1)
 
  overs <- over(syr, industrialBuff)
 
@@ -135,7 +135,7 @@ notSchools <- syr[syr$LandUse!="Schools", ]
 plot(notSchools, col = "grey", border = F)
 plot(schools, add = T, col = "red")
 
-schoolBuff <- gBuffer(schools, width = .001812, capStyle = "FLAT")
+schoolBuff <- gBuffer(schools, width = .001812, capStyle = "FLAT", quadsegs = 1)
 
  overs <- over(syr, schoolBuff)
 
