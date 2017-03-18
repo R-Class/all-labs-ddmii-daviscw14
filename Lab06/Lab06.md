@@ -12,7 +12,7 @@ library( sp )
 library(maps)
 
 syr <- readShapePoly( fn="shapefiles/tl_2010_36067_tract10", proj4string=CRS("+proj=longlat +datum=WGS84") )
-
+syr <- syr[as.numeric(as.character(syr$NAME10)) < 64, ]
 par( mar=c(0,0,0,0) )
 plot( syr,  border="gray10" )
 ```
@@ -92,13 +92,13 @@ plot( interstate_clipped, col="red", add=T)
 map.scale( metric=F, ratio=F, relwidth = 0.05, cex=0.5 )
   
 points(lat.lon$lon, lat.lon$lat, pch = 19, cex=.3)
-buff <- gBuffer(interstate_clipped, width = .003621)
+buff <- gBuffer(interstate_clipped, width = .005)
 plot(buff, add=T)
 ```
 
 ![](Lab06_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
-##Buffer it up
+##Less find the points near dat highway
 
 ```r
 lat.lon <- SpatialPoints(lat.lon, proj4string = CRS("+proj=longlat +datum=WGS84") )
@@ -120,7 +120,7 @@ nearHighway
 ##    25    26    27    28    29    30    31    32    33    34    35    36 
 ## FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
 ##    37    38    39    40    41    42    43    44    45    46    47    48 
-## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE 
+## FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE FALSE 
 ##    49    50    51    52    53    54    55    56    57    58    59    60 
 ## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
 ##    61    62    63    64    65    66    67    68    69    70    71    72 
@@ -128,9 +128,9 @@ nearHighway
 ##    73    74    75    76    77    78    79    80    81    82    83    84 
 ## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE 
 ##    85    86    87    88    89    90    91    92    93    94    95    96 
-## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
+## FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
 ##    97    98    99   100   101   102   103   104   105   106   107   108 
-## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
+## FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE  TRUE FALSE 
 ##   109   110   111   112   113   114   115   116   117   118   119   120 
 ## FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE 
 ##   121   122   123   124   125   126   127   128   129   130   131   132 
@@ -138,8 +138,19 @@ nearHighway
 ##   133   134   135   136   137   138   139   140   141   142   143   144 
 ## FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE 
 ##   145   146   147   148 
-## FALSE FALSE FALSE FALSE
+##  TRUE FALSE FALSE FALSE
 ```
+
+##Less plot it
+
+```r
+plot(syr, border = "gray80")
+plot(interstate_clipped, col = "red", add = T)
+points(lat.lon$lon[!nearHighway], lat.lon$lat[!nearHighway], pch = 19, cex = .3)
+points(lat.lon$lon[nearHighway], lat.lon$lat[nearHighway], pch = 19, cex = 1, col = "yellow")
+```
+
+![](Lab06_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 #Part II
 
@@ -183,7 +194,7 @@ plot(industrialBuff, add = T, col = rgb(44, 4, 248, alpha = 50, maxColorValue = 
 map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
 ```
 
-![](Lab06_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](Lab06_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 
 ```r
@@ -207,6 +218,6 @@ plot(schoolBuff, add = T, col = rgb(248, 18, 18, alpha = 50, maxColorValue = 355
 map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
 ```
 
-![](Lab06_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](Lab06_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 

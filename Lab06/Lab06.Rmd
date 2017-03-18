@@ -19,7 +19,7 @@ library( sp )
 library(maps)
 
 syr <- readShapePoly( fn="shapefiles/tl_2010_36067_tract10", proj4string=CRS("+proj=longlat +datum=WGS84") )
-
+syr <- syr[as.numeric(as.character(syr$NAME10)) < 64, ]
 par( mar=c(0,0,0,0) )
 plot( syr,  border="gray10" )
 
@@ -75,12 +75,12 @@ plot( interstate_clipped, col="red", add=T)
 map.scale( metric=F, ratio=F, relwidth = 0.05, cex=0.5 )
   
 points(lat.lon$lon, lat.lon$lat, pch = 19, cex=.3)
-buff <- gBuffer(interstate_clipped, width = .003621)
+buff <- gBuffer(interstate_clipped, width = .005)
 plot(buff, add=T)
 
 ```
 
-##Buffer it up
+##Less find the points near dat highway
 ```{r}
 
 lat.lon <- SpatialPoints(lat.lon, proj4string = CRS("+proj=longlat +datum=WGS84") )
@@ -92,6 +92,15 @@ nearHighway <- overStuff==1
 houses<- mutate(houses, nearHighway)
 
 nearHighway
+```
+
+##Less plot it
+```{r}
+plot(syr, border = "gray80")
+plot(interstate_clipped, col = "red", add = T)
+points(lat.lon$lon[!nearHighway], lat.lon$lat[!nearHighway], pch = 19, cex = .3)
+points(lat.lon$lon[nearHighway], lat.lon$lat[nearHighway], pch = 19, cex = 1, col = "yellow")
+
 ```
 
 #Part II
