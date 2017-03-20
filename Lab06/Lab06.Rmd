@@ -29,9 +29,6 @@ plot( syr,  border="gray10" )
 ```{r}
 roads <- readShapeLines( fn="shapefiles/tl_2015_36_prisecroads", proj4string=CRS("+proj=longlat +datum=WGS84") )
 
-head( roads@data )
-table( roads$RTTYP )
-
 #Extract Intersate
 interstate <- roads[ roads$RTTYP == "I" , ]
 ```
@@ -119,44 +116,99 @@ industrials <- syr[syr$LandUse=="Industrial", ]
 notIndustrials <- syr[syr$LandUse!="Industrial", ]
 
 plot(notIndustrials, col = "grey", border = F)
-
-plot(industrials, add = T, col = "blue")
-
-industrialBuff <- gBuffer(industrials, width = .003621, capStyle = "FLAT", quadsegs = 1)
-
- overs <- over(syr, industrialBuff)
-
-nearIndustry <- overs==1
-nearIndustry[is.na(nearIndustry)]<- F
-
-syr <- cbind(syr, nearIndustry)
-
-plot(industrialBuff, add = T, col = rgb(44, 4, 248, alpha = 50, maxColorValue = 355))
-
-map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+plot(industrials, add = T, col = "blue", border = F)
 
 ```
+##Buff it up
+```{r}
+plot(notIndustrials, col = "grey", border = F)
+plot(industrials, add = T, col = "blue", border = F)
 
+industrialBuff <- gBuffer(industrials, width = .003621, capStyle = "FLAT", quadsegs = 1)
+plot(industrialBuff, add = T, col = rgb(44, 4, 248, alpha = 50, maxColorValue = 355))
+map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+```
+##Add houses
+```{r}
+plot(notIndustrials, col = "grey", border = F)
+plot(industrials, add = T, col = "blue", border = F)
+
+plot(industrialBuff, add = T, col = rgb(44, 4, 248, alpha = 50, maxColorValue = 355))
+map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+points(lat.lon$lon, lat.lon$lat, pch = 19, cex=.2)
+```
+
+##Let's get some overs
+```{r}
+lat.lon <- read.csv("lat.lon.csv", stringsAsFactors = F)
+lat.lon <- lat.lon[ c("lon","lat")]
+lat.lon <- SpatialPoints(lat.lon, proj4string = CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") )
+overs <- over(lat.lon, industrialBuff)
+nearIndustry <- overs==1
+names(nearIndustry) <- NULL
+nearIndustry[is.na(nearIndustry)]<- F
+houses <- cbind(houses, nearIndustry)
+```
+##Let's plot this
+```{r}
+plot(notIndustrials, col = "grey", border = F)
+plot(industrials, add = T, col = "blue", border = F)
+
+points(lat.lon$lon[nearIndustry], lat.lon$lat[nearIndustry], pch = 19, cex=.4, col = "yellow")
+points(lat.lon$lon[!nearIndustry], lat.lon$lat[!nearIndustry], pch = 19, cex=.2)
+```
+
+
+
+
+##Now with schools
 ```{r}
 schools <- syr[syr$LandUse=="Schools", ]
 notSchools <- syr[syr$LandUse!="Schools", ]
 
 plot(notSchools, col = "grey", border = F)
-plot(schools, add = T, col = "red")
+plot(schools, add = T, col = "red", border = F)
+
+```
+##Less add the buffer
+```{r}
+plot(notSchools, col = "grey", border = F)
+plot(schools, add = T, col = "red", border = F)
 
 schoolBuff <- gBuffer(schools, width = .001812, capStyle = "FLAT", quadsegs = 1)
-
- overs <- over(syr, schoolBuff)
-
-nearSchools <- overs==1
-nearSchools[is.na(nearSchools)]<- F
-
-syr <- cbind(syr, nearSchools)
+plot(schoolBuff, add = T, col = rgb(248, 18, 18, alpha = 50, maxColorValue = 355))
+map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+```
+##Less plot some houses
+```{r}
+plot(notSchools, col = "grey", border = F)
+plot(schools, add = T, col = "red", border = F)
 
 plot(schoolBuff, add = T, col = rgb(248, 18, 18, alpha = 50, maxColorValue = 355))
-
 map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+points(lat.lon$lon, lat.lon$lat, pch = 19, cex=.2)
 
 ```
 
+##Let's over
+```{r}
+lat.lon <- read.csv("lat.lon.csv", stringsAsFactors = F)
+lat.lon <- lat.lon[ c("lon","lat")]
+lat.lon <- SpatialPoints(lat.lon, proj4string = CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") )
+overs <- over(lat.lon, schoolBuff)
+nearSchools <- overs==1
+names(nearSchools) <- NULL
+nearSchools[is.na(nearSchools)]<- F
+houses <- cbind(houses, nearSchools)
+
+```
+
+##Less plot it
+```{r}
+plot(notSchools, col = "grey", border = F)
+plot(schools, add = T, col = "red", border = F)
+
+points(lat.lon$lon[nearSchools], lat.lon$lat[nearSchools], pch = 19, cex=.4, col = "yellow")
+points(lat.lon$lon[!nearSchools], lat.lon$lat[!nearSchools], pch = 19, cex=.2)
+```
 

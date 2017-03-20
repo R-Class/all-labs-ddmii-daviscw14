@@ -24,26 +24,6 @@ plot( syr,  border="gray10" )
 ```r
 roads <- readShapeLines( fn="shapefiles/tl_2015_36_prisecroads", proj4string=CRS("+proj=longlat +datum=WGS84") )
 
-head( roads@data )
-```
-
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["LINEARID"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["FULLNAME"],"name":[2],"type":["fctr"],"align":["left"]},{"label":["RTTYP"],"name":[3],"type":["fctr"],"align":["left"]},{"label":["MTFCC"],"name":[4],"type":["fctr"],"align":["left"]}],"data":[{"1":"1104486676574","2":"Ny St Thruway Berkshire Exd","3":"M","4":"S1200"},{"1":"1104493254230","2":"Center St Exd","3":"M","4":"S1200"},{"1":"1104492126212","2":"Oak St Exd","3":"M","4":"S1200"},{"1":"110788145083","2":"Main St Exd","3":"M","4":"S1200"},{"1":"110788617875","2":"Gilbert St Exd","3":"M","4":"S1200"},{"1":"110496874399","2":"Forest Ave Exd","3":"M","4":"S1200"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-
-```r
-table( roads$RTTYP )
-```
-
-```
-## 
-##    C    I    M    O    S    U 
-##  826  268 7009   40 2774  473
-```
-
-```r
 #Extract Intersate
 interstate <- roads[ roads$RTTYP == "I" , ]
 ```
@@ -177,47 +157,120 @@ industrials <- syr[syr$LandUse=="Industrial", ]
 notIndustrials <- syr[syr$LandUse!="Industrial", ]
 
 plot(notIndustrials, col = "grey", border = F)
-
-plot(industrials, add = T, col = "blue")
-
-industrialBuff <- gBuffer(industrials, width = .003621, capStyle = "FLAT", quadsegs = 1)
-
- overs <- over(syr, industrialBuff)
-
-nearIndustry <- overs==1
-nearIndustry[is.na(nearIndustry)]<- F
-
-syr <- cbind(syr, nearIndustry)
-
-plot(industrialBuff, add = T, col = rgb(44, 4, 248, alpha = 50, maxColorValue = 355))
-
-map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+plot(industrials, add = T, col = "blue", border = F)
 ```
 
 ![](Lab06_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+##Buff it up
 
+```r
+plot(notIndustrials, col = "grey", border = F)
+plot(industrials, add = T, col = "blue", border = F)
+
+industrialBuff <- gBuffer(industrials, width = .003621, capStyle = "FLAT", quadsegs = 1)
+plot(industrialBuff, add = T, col = rgb(44, 4, 248, alpha = 50, maxColorValue = 355))
+map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+```
+
+![](Lab06_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+##Add houses
+
+```r
+plot(notIndustrials, col = "grey", border = F)
+plot(industrials, add = T, col = "blue", border = F)
+
+plot(industrialBuff, add = T, col = rgb(44, 4, 248, alpha = 50, maxColorValue = 355))
+map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+points(lat.lon$lon, lat.lon$lat, pch = 19, cex=.2)
+```
+
+![](Lab06_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
+##Let's get some overs
+
+```r
+lat.lon <- read.csv("lat.lon.csv", stringsAsFactors = F)
+lat.lon <- lat.lon[ c("lon","lat")]
+lat.lon <- SpatialPoints(lat.lon, proj4string = CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") )
+overs <- over(lat.lon, industrialBuff)
+nearIndustry <- overs==1
+names(nearIndustry) <- NULL
+nearIndustry[is.na(nearIndustry)]<- F
+houses <- cbind(houses, nearIndustry)
+```
+##Let's plot this
+
+```r
+plot(notIndustrials, col = "grey", border = F)
+plot(industrials, add = T, col = "blue", border = F)
+
+points(lat.lon$lon[nearIndustry], lat.lon$lat[nearIndustry], pch = 19, cex=.4, col = "yellow")
+points(lat.lon$lon[!nearIndustry], lat.lon$lat[!nearIndustry], pch = 19, cex=.2)
+```
+
+![](Lab06_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+
+
+
+
+##Now with schools
 
 ```r
 schools <- syr[syr$LandUse=="Schools", ]
 notSchools <- syr[syr$LandUse!="Schools", ]
 
 plot(notSchools, col = "grey", border = F)
-plot(schools, add = T, col = "red")
+plot(schools, add = T, col = "red", border = F)
+```
+
+![](Lab06_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+##Less add the buffer
+
+```r
+plot(notSchools, col = "grey", border = F)
+plot(schools, add = T, col = "red", border = F)
 
 schoolBuff <- gBuffer(schools, width = .001812, capStyle = "FLAT", quadsegs = 1)
-
- overs <- over(syr, schoolBuff)
-
-nearSchools <- overs==1
-nearSchools[is.na(nearSchools)]<- F
-
-syr <- cbind(syr, nearSchools)
-
 plot(schoolBuff, add = T, col = rgb(248, 18, 18, alpha = 50, maxColorValue = 355))
-
 map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
 ```
 
-![](Lab06_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+![](Lab06_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+##Less plot some houses
 
+```r
+plot(notSchools, col = "grey", border = F)
+plot(schools, add = T, col = "red", border = F)
+
+plot(schoolBuff, add = T, col = rgb(248, 18, 18, alpha = 50, maxColorValue = 355))
+map.scale( metric=F, ratio=F, relwidth = 0.15, cex=0.5 )
+points(lat.lon$lon, lat.lon$lat, pch = 19, cex=.2)
+```
+
+![](Lab06_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+
+##Let's over
+
+```r
+lat.lon <- read.csv("lat.lon.csv", stringsAsFactors = F)
+lat.lon <- lat.lon[ c("lon","lat")]
+lat.lon <- SpatialPoints(lat.lon, proj4string = CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") )
+overs <- over(lat.lon, schoolBuff)
+nearSchools <- overs==1
+names(nearSchools) <- NULL
+nearSchools[is.na(nearSchools)]<- F
+houses <- cbind(houses, nearSchools)
+```
+
+##Less plot it
+
+```r
+plot(notSchools, col = "grey", border = F)
+plot(schools, add = T, col = "red", border = F)
+
+points(lat.lon$lon[nearSchools], lat.lon$lat[nearSchools], pch = 19, cex=.4, col = "yellow")
+points(lat.lon$lon[!nearSchools], lat.lon$lat[!nearSchools], pch = 19, cex=.2)
+```
+
+![](Lab06_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
 
