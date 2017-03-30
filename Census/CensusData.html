@@ -133,7 +133,22 @@ temp&lt;- NULL
 census&lt;- NULL
 for(i in 2011:2015)
 {
-temp &lt;- getCensus(name = &quot;acs5&quot;, vintage = i, key = censuskey, vars = c(&quot;NAME&quot;,&quot;B01001_001E&quot;, &quot;B19013_001E&quot;, &quot;B19113_001E&quot;, &quot;B01001B_001E&quot;,&quot;B01001D_001E&quot;, &quot;B01001I_001E&quot;,&quot;B01001A_001E&quot;,&quot;B23025_004E&quot;, &quot;B23025_005E&quot;, &quot;B23025_002E&quot;, &quot;B17001_002E&quot;, &quot;B25004_001E&quot;, &quot;B25004_008E&quot;, &quot;B25004_002E&quot;, &quot;B25004_006E&quot;, &quot;B25004_004E&quot;, &quot;B22003_002E&quot;, &quot;B11001_001E&quot;, &quot;B25003_002E&quot;, &quot;B25003_003E&quot;,&quot;B25051_001E&quot;, &quot;B25051_003E&quot;, &quot;B25047_003E&quot;, &quot;B25105_001E&quot;, &quot;B09001_001E&quot;, &quot;B17010_017E&quot;, &quot;B08136_001E&quot;, &quot;B14001_002E&quot;), region = &quot;tract:*&quot;, regionin = &quot;state: 36 + county:067&quot;)
+temp &lt;- getCensus(name = &quot;acs5&quot;, vintage = i, key = censuskey, 
+                  vars = c(&quot;NAME&quot;,&quot;B01001_001E&quot;, 
+                           &quot;B19013_001E&quot;, &quot;B19113_001E&quot;, 
+                           &quot;B01001B_001E&quot;,&quot;B01001D_001E&quot;,
+                           &quot;B01001I_001E&quot;,&quot;B01001A_001E&quot;,
+                           &quot;B23025_004E&quot;, &quot;B23025_005E&quot;, 
+                           &quot;B23025_002E&quot;, &quot;B17001_002E&quot;, 
+                           &quot;B25004_001E&quot;, &quot;B25004_008E&quot;, 
+                           &quot;B25004_002E&quot;, &quot;B25004_006E&quot;, 
+                           &quot;B25004_004E&quot;, &quot;B22003_002E&quot;, 
+                           &quot;B11001_001E&quot;, &quot;B25003_002E&quot;, 
+                           &quot;B25003_003E&quot;,&quot;B25051_001E&quot;, 
+                           &quot;B25051_003E&quot;, &quot;B25047_003E&quot;, 
+                           &quot;B25105_001E&quot;, &quot;B09001_001E&quot;, 
+                           &quot;B17010_017E&quot;, &quot;B08136_001E&quot;, 
+                           &quot;B14001_002E&quot;), region = &quot;tract:*&quot;, regionin = &quot;state: 36 + county:067&quot;)
 
 temp &lt;- mutate(temp, year = i)
 
@@ -145,7 +160,16 @@ census &lt;- mutate(census, GEOID)
 
 
 
-labels &lt;- c(&quot;name&quot;, &quot;state&quot;, &quot;county&quot;, &quot;tract&quot;, &quot;total&quot;, &quot;medianHouseIncome&quot;, &quot;medianFamIncome&quot;, &quot;black&quot;, &quot;asian&quot;, &quot;hispanic&quot;, &quot;white&quot;,&quot;employed&quot;, &quot;unemployed&quot;, &quot;inLaborForce&quot;, &quot;poverty&quot;, &quot;vacantTotal&quot;, &quot;otherVacant&quot;, &quot;vacantForRent&quot;, &quot;seasonalVacant&quot;, &quot;forSaleVacant&quot;,&quot;householdReceivedSnap&quot;, &quot;households&quot;,  &quot;ownerOccupied&quot;, &quot;renterOccupied&quot;,&quot;totalHousingUnits&quot;, &quot;lackingKitchenFacilities&quot;, &quot;lackingPlumbing&quot;, &quot;medianMonthlyHousingCosts&quot;,&quot;less18&quot;, &quot;singleMotherBelowPoverty&quot;, &quot;travelTimeToWorkMin&quot;, &quot;enrolledInSchool&quot;,  &quot;year&quot;, &quot;GEOID&quot;)
+labels &lt;- c(&quot;name&quot;, &quot;state&quot;, &quot;county&quot;, 
+            &quot;tract&quot;, &quot;total&quot;, &quot;medianHouseIncome&quot;, 
+            &quot;medianFamIncome&quot;, &quot;black&quot;, &quot;asian&quot;, 
+            &quot;hispanic&quot;, &quot;white&quot;,&quot;employed&quot;, &quot;unemployed&quot;, 
+            &quot;inLaborForce&quot;, &quot;poverty&quot;, &quot;vacantTotal&quot;, &quot;otherVacant&quot;, 
+            &quot;vacantForRent&quot;, &quot;seasonalVacant&quot;, &quot;forSaleVacant&quot;,&quot;householdReceivedSnap&quot;,
+            &quot;households&quot;,  &quot;ownerOccupied&quot;, &quot;renterOccupied&quot;,&quot;totalHousingUnits&quot;,
+            &quot;lackingKitchenFacilities&quot;, &quot;lackingPlumbing&quot;, &quot;medianMonthlyHousingCosts&quot;,
+            &quot;less18&quot;, &quot;singleMotherBelowPoverty&quot;, &quot;travelTimeToWorkMin&quot;, &quot;enrolledInSchool&quot;, 
+            &quot;year&quot;, &quot;GEOID&quot;)
 
 names(census) &lt;- labels
 census &lt;- tbl_df(census)
@@ -153,22 +177,59 @@ census &lt;- tbl_df(census)
 syrCensus&lt;- filter(census, as.numeric(tract)&lt;10000)
 
 
-census2010 &lt;- getCensus(name = &quot;sf1&quot;, vintage = 2010, key = censuskey, vars = c(&quot;NAME&quot;, &quot;P0010001&quot;, &quot;P0030002&quot;, &quot;P0030003&quot;, &quot;P0030005&quot;, &quot;P0040003&quot;, &quot;H0030003&quot;,  &quot;H0050008&quot;, &quot;H0050002&quot;, &quot;H0050006&quot;, &quot;H0050004&quot;, &quot;P0180001&quot;, &quot;H0140002&quot;, &quot;H0040004&quot;, &quot;H00010001&quot;, &quot;P0160002&quot;), region = &quot;tract:*&quot;, regionin = &quot;state: 36 + county:067&quot;)
+census2010 &lt;- getCensus(name = &quot;sf1&quot;, vintage = 2010, 
+                        key = censuskey,
+                        vars = c(&quot;NAME&quot;, &quot;P0010001&quot;, &quot;P0030002&quot;, 
+                                 &quot;P0030003&quot;, &quot;P0030005&quot;, &quot;P0040003&quot;, 
+                                 &quot;H0030003&quot;,  &quot;H0050008&quot;, &quot;H0050002&quot;, 
+                                 &quot;H0050006&quot;, &quot;H0050004&quot;, &quot;P0180001&quot;, &quot;H0140002&quot;, 
+                                 &quot;H0040004&quot;, &quot;H00010001&quot;, &quot;P0160002&quot;),
+                        region = &quot;tract:*&quot;, 
+                        regionin = &quot;state: 36 + county:067&quot;)
 
-names(census2010) &lt;- c(&quot;name&quot;,&quot;state&quot;, &quot;county&quot;, &quot;tract&quot;, &quot;total&quot;, &quot;white&quot;, &quot;black&quot;, &quot;asian&quot;, &quot;hispanic&quot;, &quot;vacant&quot;, &quot;otherVacant&quot;, &quot;vacantForRent&quot;, &quot;seasonalVacant&quot;, &quot;forSaleVacant&quot;, &quot;households&quot;, &quot;ownerOccupied&quot;, &quot;renterOccupied&quot;, &quot;totalHousingUnits&quot;, &quot;less18&quot;)
+names(census2010) &lt;- c(&quot;name&quot;,&quot;state&quot;, &quot;county&quot;, &quot;tract&quot;, 
+                       &quot;total&quot;, &quot;white&quot;, &quot;black&quot;, &quot;asian&quot;, 
+                       &quot;hispanic&quot;, &quot;vacant&quot;, &quot;otherVacant&quot;, 
+                       &quot;vacantForRent&quot;, &quot;seasonalVacant&quot;, &quot;forSaleVacant&quot;,
+                       &quot;households&quot;, &quot;ownerOccupied&quot;, &quot;renterOccupied&quot;, 
+                       &quot;totalHousingUnits&quot;, &quot;less18&quot;)
 census2010 &lt;- tbl_df(census2010)
 census2010&lt;- filter(census2010, as.numeric(tract)&lt;10000)
 
-census2000 &lt;- getCensus(name = &quot;sf1&quot;, vintage = 2000, key = censuskey, vars = c(&quot;NAME&quot;, &quot;P001001&quot;, &quot;P003003&quot;, &quot;P003004&quot;, &quot;P003006&quot;, &quot;P004002&quot;, &quot;H005001&quot;, &quot;H005007&quot;, &quot;H005002&quot;, &quot;H005005&quot;, &quot;H005003&quot;, &quot;P015001&quot;, &quot;H004002&quot;, &quot;H004003&quot;,&quot;H001001&quot;), region = &quot;tract:*&quot;, regionin = &quot;state: 36 + county:067&quot;)
+census2000 &lt;- getCensus(name = &quot;sf1&quot;, vintage = 2000, 
+                        key = censuskey, 
+                        vars = c(&quot;NAME&quot;, &quot;P001001&quot;, &quot;P003003&quot;, 
+                                 &quot;P003004&quot;, &quot;P003006&quot;, &quot;P004002&quot;, 
+                                 &quot;H005001&quot;, &quot;H005007&quot;, &quot;H005002&quot;, 
+                                 &quot;H005005&quot;, &quot;H005003&quot;, &quot;P015001&quot;, 
+                                 &quot;H004002&quot;, &quot;H004003&quot;,&quot;H001001&quot;), 
+                        region = &quot;tract:*&quot;, 
+                        regionin = &quot;state: 36 + county:067&quot;)
 
-names(census2000) &lt;- c(&quot;name&quot;,&quot;state&quot;, &quot;county&quot;, &quot;tract&quot;, &quot;total&quot;, &quot;white&quot;, &quot;black&quot;, &quot;asian&quot;, &quot;hispanic&quot;, &quot;vacant&quot;, &quot;otherVacant&quot;, &quot;vacantForRent&quot;, &quot;seasonalVacant&quot;, &quot;forSaleVacant&quot;, &quot;households&quot;, &quot;ownerOccupied&quot;, &quot;renterOccupied&quot;, &quot;totalHousingUnits&quot;)
+names(census2000) &lt;- c(&quot;name&quot;,&quot;state&quot;, &quot;county&quot;, &quot;tract&quot;, 
+                       &quot;total&quot;, &quot;white&quot;, &quot;black&quot;, &quot;asian&quot;, 
+                       &quot;hispanic&quot;, &quot;vacant&quot;, &quot;otherVacant&quot;, 
+                       &quot;vacantForRent&quot;, &quot;seasonalVacant&quot;, 
+                       &quot;forSaleVacant&quot;, &quot;households&quot;, 
+                       &quot;ownerOccupied&quot;, &quot;renterOccupied&quot;, &quot;totalHousingUnits&quot;)
 
 census2000 &lt;- tbl_df(census2000)
 census2000&lt;- filter(census2000, as.numeric(tract)&lt;10000)
 
-moreCensus2000&lt;- getCensus(name = &quot;sf3&quot;, vintage = 2000, key = censuskey, vars = c(&quot;NAME&quot;, &quot;P053001&quot;, &quot;P077001&quot;, &quot;P043007&quot;, &quot;P043014&quot;, &quot;P043003&quot;, &quot;P043010&quot;, &quot;P087002&quot;, &quot;P087001&quot;, &quot;H047003&quot;, &quot;H050003&quot;, &quot;P130003&quot;, &quot;P038010&quot;), region = &quot;tract:*&quot;, regionin = &quot;state: 36 + county:067&quot;)
+moreCensus2000&lt;- getCensus(name = &quot;sf3&quot;, vintage = 2000, 
+                           key = censuskey,
+                           vars = c(&quot;NAME&quot;, &quot;P053001&quot;, &quot;P077001&quot;,
+                                    &quot;P043007&quot;, &quot;P043014&quot;, &quot;P043003&quot;,
+                                    &quot;P043010&quot;, &quot;P087002&quot;, &quot;P087001&quot;, 
+                                    &quot;H047003&quot;, &quot;H050003&quot;, &quot;P130003&quot;, &quot;P038010&quot;), 
+                           region = &quot;tract:*&quot;, regionin = &quot;state: 36 + county:067&quot;)
 
-names(moreCensus2000) &lt;- c(&quot;name&quot;, &quot;state&quot;, &quot;county&quot;, &quot;tract&quot;,&quot;medianHouseIncome&quot;, &quot;medianFamIncome&quot;, &quot;maleUnemployed&quot;, &quot;femaleUnemployed&quot;, &quot;maleLaborForce&quot;, &quot;femaleLaborForce&quot;, &quot;poverty&quot;, &quot;totalForPoverty&quot;, &quot;lackingPlumbing&quot;, &quot;lackingKitchenFacilities&quot;, &quot;aggregateTravelTimeToWork&quot;, &quot;enrolledInSchool&quot;)
+names(moreCensus2000) &lt;- c(&quot;name&quot;, &quot;state&quot;, &quot;county&quot;, &quot;tract&quot;,
+                           &quot;medianHouseIncome&quot;, &quot;medianFamIncome&quot;, &quot;maleUnemployed&quot;,
+                           &quot;femaleUnemployed&quot;, &quot;maleLaborForce&quot;, &quot;femaleLaborForce&quot;, 
+                           &quot;poverty&quot;, &quot;totalForPoverty&quot;, &quot;lackingPlumbing&quot;,
+                           &quot;lackingKitchenFacilities&quot;, &quot;aggregateTravelTimeToWork&quot;,
+                           &quot;enrolledInSchool&quot;)
 
 moreCensus2000 &lt;- tbl_df(moreCensus2000)
 moreCensus2000&lt;- filter(moreCensus2000, as.numeric(tract)&lt;10000)
